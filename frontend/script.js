@@ -14,8 +14,14 @@ async function createResource() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(resource)
     });
-
+    loadResources(); 
     alert("Resource Created");
+
+document.getElementById("name").value = "";
+document.getElementById("category").value = "";
+document.getElementById("price").value = "";
+document.getElementById("inventory").value = "";
+    
 }
 
 async function loadResources() {
