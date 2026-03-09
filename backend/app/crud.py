@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
-import models
-import schemas
+from . import models, schemas
 
 def create_resource(db: Session, resource: schemas.ResourceCreate):
     db_resource = models.Resource(**resource.dict())
