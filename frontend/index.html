@@ -42,6 +42,32 @@ Load Resources
 
 </div>
 
+
+<div class="card p-4 mt-4">
+
+<h4>Create Booking</h4>
+
+<input id="email" class="form-control mb-2" placeholder="User Email">
+
+<input id="resourceId" class="form-control mb-2" placeholder="Resource ID">
+
+<input id="startTime" class="form-control mb-2" placeholder="Start Time (YYYY-MM-DDTHH:MM:SS)">
+
+<input id="endTime" class="form-control mb-2" placeholder="End Time (YYYY-MM-DDTHH:MM:SS)">
+
+<button class="btn btn-warning mb-2" onclick="checkAvailability()">
+Check Availability
+</button>
+
+<button class="btn btn-primary" onclick="createBooking()">
+Create Booking
+</button>
+
+<p id="availabilityResult" class="mt-3 fw-bold"></p>
+
+</div>
+
+
 <script src="script.js"></script>
 
 </body>
