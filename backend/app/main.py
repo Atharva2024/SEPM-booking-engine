@@ -38,3 +38,15 @@ def create_resource(resource: schemas.ResourceCreate, db: Session = Depends(get_
 @app.get("/resources", response_model=list[schemas.ResourceResponse])
 def read_resources(db: Session = Depends(get_db)):
     return crud.get_resources(db)
+
+@app.post("/bookings")
+def create_booking(booking: schemas.BookingCreate, db: Session = Depends(get_db)):
+    return crud.create_booking(db=db, booking=booking)
+
+@app.get("/bookings")
+def read_bookings(db: Session = Depends(get_db)):
+    return db.query(models.Booking).all()
+
+@app.get("/booking-items")
+def read_booking_items(db: Session = Depends(get_db)):
+    return db.query(models.BookingItem).all()
