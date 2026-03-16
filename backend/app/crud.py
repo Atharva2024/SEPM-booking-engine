@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
+from fastapi import HTTPException
 
 def create_resource(db: Session, resource: schemas.ResourceCreate):
     db_resource = models.Resource(**resource.dict())
@@ -48,17 +49,36 @@ def create_booking(db: Session, booking: schemas.BookingCreate):
 
         if item.quantity > resource.total_inventory:
             raise Exception(f"Not enough inventory for {resource.name}")
+        
+        overlapping_items = (
+        db.query(models.BookingItem)
+        .join(models.Booking)
+        .filter(
+            models.BookingItem.resource_id == item.resource_id,
+            models.Booking.start_time < booking.end_time,
+            models.Booking.end_time > booking.start_time
+        )
+        .all()
+    )
 
-        price = float(resource.price_per_hour) * item.quantity * hours
-        total_price += price
+    used_quantity = sum(i.quantity for i in overlapping_items)
 
-        booking_item = models.BookingItem(
+    if used_quantity + item.quantity > resource.total_inventory:
+        raise HTTPException(
+    status_code=400,
+    detail=f"{resource.name} is not available for that time slot"
+)
+
+    price = float(resource.price_per_hour) * item.quantity * hours
+    total_price += price
+
+    booking_item = models.BookingItem(
             booking_id=db_booking.id,
             resource_id=item.resource_id,
             quantity=item.quantity
         )
 
-        db.add(booking_item)
+    db.add(booking_item)
 
     # update final price
     db_booking.total_price = total_price
