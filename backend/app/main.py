@@ -50,3 +50,36 @@ def read_bookings(db: Session = Depends(get_db)):
 @app.get("/booking-items")
 def read_booking_items(db: Session = Depends(get_db)):
     return db.query(models.BookingItem).all()
+
+from datetime import datetime
+
+@app.get("/availability")
+def check_availability(
+    resource_id: int,
+    start_time: str,
+    end_time: str,
+    db: Session = Depends(get_db)
+):
+
+    start = datetime.fromisoformat(start_time)
+    end = datetime.fromisoformat(end_time)
+
+    overlapping_items = (
+        db.query(models.BookingItem)
+        .join(models.Booking)
+        .filter(
+            models.BookingItem.resource_id == resource_id,
+            models.Booking.start_time < end,
+            models.Booking.end_time > start
+        )
+        .all()
+    )
+
+    resource = db.query(models.Resource).filter(models.Resource.id == resource_id).first()
+
+    used_quantity = sum(item.quantity for item in overlapping_items)
+
+    if used_quantity >= resource.total_inventory:
+        return {"available": False}
+
+    return {"available": True}
